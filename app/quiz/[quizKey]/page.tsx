@@ -149,7 +149,7 @@ const QuizPage: React.FC = () => {
     };
 
     const getAnsweredCount = (): number => {
-        return Object.keys(userAnswers).length + (selectedAnswer !== null ? 1 : 0);
+        return Object.keys(userAnswers).length;
     };
 
     if (!quizkey || !quizData) {
