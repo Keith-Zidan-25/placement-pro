@@ -27,7 +27,7 @@ export default function Home() {
                     <p className="text-lg mb-8 animate-fade-up">
                         Elevate your career with expert guidance and industry insights.
                     </p>
-                    <a href="#courses" className="px-6 py-3 bg-purple-700 text-white rounded-full text-lg transition hover:bg-purple-900 animate-zoom-in">
+                    <a href="/quizzes" className="px-6 py-3 bg-purple-700 text-white rounded-full text-lg transition hover:bg-purple-900 animate-zoom-in">
                         Explore Quizzes
                     </a>
                 </div>
