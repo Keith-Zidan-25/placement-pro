@@ -120,6 +120,8 @@ const QuizPage: React.FC = () => {
     };
 
     const submitToServer = async (submissionData: QuizSubmissionData): Promise<void> => {
+        // console.log(submissionData);
+
         try {
             const result = await sendRequest({
                 config: {

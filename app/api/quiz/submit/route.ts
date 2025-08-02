@@ -14,16 +14,17 @@ type AnswerObject = {
 
 const answerValueMap: StringKeyObject = { "A": 0, "B": 1, "C": 2, "D": 3 }
 
-async function calculateScore(userAnswers: object, correctAnswers: AnswerObject[]) {
+async function calculateScore(userAnswers: StringKeyObject, correctAnswers: AnswerObject[]) {
     const answers = Object.values(userAnswers);
 
     let score = 0
     for (let i = 0; i < answers.length; i++) {
         const stringOptionIndex = correctAnswers[i];
-        // console.log(`option Index: ${stringOptionIndex.answer} users: ${answers[i]}`);
+        const stringId = String(stringOptionIndex._id)
+        // console.log(`option Index: ${stringOptionIndex._id}:${stringOptionIndex.answer} users: ${userAnswers[stringId]}`);
 
-        if (answerValueMap[stringOptionIndex.answer] === answers[i]) {
-            score += 1
+        if (answerValueMap[stringOptionIndex.answer] === userAnswers[stringId]) {
+            score += 1;
         }
     }
 
@@ -37,6 +38,8 @@ export async function POST(req: NextRequest) {
         const { quizId, answers, timeSpent, completedAt } = await req.json();
         const stringIds = Object.keys(answers);
         const objectIds = []
+
+        // console.log(answers);
 
         for (let i = 0; i < stringIds.length; i++) {
             objectIds.push(new mongoose.Types.ObjectId(stringIds[i]));
