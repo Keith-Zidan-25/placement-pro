@@ -18,8 +18,8 @@ export default function Home() {
                 <Navbar linkList={linkList} className={'text-white'}/>
             </header>
 
-            <section id="Home" className="h-screen flex items-center justify-center text-center relative text-white bg-cover bg-center"
-                style={{ backgroundImage: `url(https://ipfs.io/ipfs/QmZvTHLUXRvjjqHYsnz3gN5JqLvReMqZ6nAhWTz6XwchzP)` }}
+            <section id="Home" 
+                className="h-screen flex items-center justify-center text-center relative text-white bg-[url(https://ipfs.io/ipfs/QmZvTHLUXRvjjqHYsnz3gN5JqLvReMqZ6nAhWTz6XwchzP)]"
             >
                 <div className="absolute inset-0 bg-black bg-opacity-50"></div>
                 <div className="relative z-20 max-w-2xl">

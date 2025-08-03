@@ -4,22 +4,32 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, AlertCircle, ArrowRight, Send } from 'lucide-react';
 import { QuizData } from '../../../utilities/typeDefinitions';
 import { useSendRequest } from '../../../utilities/axiosInstance';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
+import LoadingScreen from '../../../components/LoadingScreen';
+import QuizIdenticationForm from '@/components/IdentityForm';
 
 interface UserAnswers {
     [questionIndex: string]: number;
 }
 
 interface QuizSubmissionData {
+    username: string;
+    numberId: string | number;
     quizId: string;
     answers: UserAnswers;
     timeSpent: number;
     completedAt: string;
 }
 
+interface UserData {
+    username: string;
+    numberId: string | number;
+}
+
 const QuizPage: React.FC = () => {
     const params = useParams();
+    const router = useRouter();
     const quizkey = Array.isArray(params.quizKey) ? params.quizKey[0] : params.quizKey;
 
     const [quizData, setQuizData] = useState<QuizData | null>(null);
@@ -29,8 +39,12 @@ const QuizPage: React.FC = () => {
     const [timeRemaining, setTimeRemaining] = useState<number>(1800);
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-    const [showResultPage, showResults] = useState<boolean>(false);
-    const [quizResult, setResults] = useState<number>(0);
+    const [quizResult, setResults] = useState<string>();
+    const [isAuthenicated, setAuthencated] = useState<boolean>(false);
+    const [userData, setUserData] = useState<UserData>({
+        username: '',
+        numberId: ''
+    })
 
     const { sendRequest } = useSendRequest();
 
@@ -104,6 +118,7 @@ const QuizPage: React.FC = () => {
                 : userAnswers;
 
         const submissionData: QuizSubmissionData = {
+            ...userData,
             quizId: quizkey ?? '',
             answers: finalAnswers,
             timeSpent: 1800 - timeRemaining,
@@ -132,7 +147,6 @@ const QuizPage: React.FC = () => {
             });
 
             if (result && result.success) {
-                setResults(result.score);
             }
         } catch (err) {
             console.log(err);
@@ -140,6 +154,7 @@ const QuizPage: React.FC = () => {
     };
 
     const handleConfirmSubmit = (): void => {
+        console.log(userData);
         setShowConfirmation(false);
         handleSubmitQuiz();
     };
@@ -152,17 +167,21 @@ const QuizPage: React.FC = () => {
         return Object.keys(userAnswers).length;
     };
 
+    const showResults = () => {
+        router.push(`/quiz/result/${quizResult}`);
+    }
+
     if (!quizkey || !quizData) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500">
-                Loading quiz...
+            <div className="min-h-screen flex items-center justify-center bg-purple-700 text-gray-500">
+                <LoadingScreen />
             </div>
         );
     }
 
     const currentQuestionData = quizData.questions[currentQuestion];
 
-    if (isSubmitted && !showResultPage) {
+    if (isSubmitted) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="max-w-2xl mx-auto px-4 text-center">
@@ -186,7 +205,7 @@ const QuizPage: React.FC = () => {
                         </div>
                     </div>
                     <button
-                        onClick={() => showResults(true)} 
+                        onClick={() => showResults()} 
                         className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
                     >
                         View Results
@@ -196,38 +215,13 @@ const QuizPage: React.FC = () => {
         );
     }
 
-    if (showResultPage) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="max-w-2xl mx-auto px-4 text-center">
-                    <div className="bg-green-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="w-12 h-12 text-green-500" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">Quiz Results</h1>
-                    <p className="text-gray-600 text-lg mb-8">
-                        You scored {quizResult}/{quizData.score}
-                    </p>
-                    {/* <div className="bg-gray-50 rounded-lg p-6 mb-8">
-                        <div className="grid grid-cols-2 gap-4 text-center">
-                            <div>
-                                <div className="text-2xl font-bold text-purple-600">{getAnsweredCount()}</div>
-                                <div className="text-sm text-gray-600">Questions Answered</div>
-                            </div>
-                            <div>
-                                <div className="text-2xl font-bold text-purple-600">{formatTime(1800 - timeRemaining)}</div>
-                                <div className="text-sm text-gray-600">Time Taken</div>
-                            </div>
-                        </div>
-                    </div> */}
-                </div>
-            </div>
-        );
-    }
-
     console.log(currentQuestionData);
 
     return (
         <div className="min-h-screen bg-white">
+            {!isAuthenicated && (
+                <QuizIdenticationForm userInput={userData} hideForm={setAuthencated} storeFormValues={setUserData} />
+            )}
             <div className="bg-gradient-to-r from-purple-900 to-purple-800 text-white sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
