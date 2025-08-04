@@ -5,6 +5,7 @@ import { Search, Filter } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import { useSendRequest } from '../../utilities/axiosInstance';
+import Loader from '../../components/Loader';
 
 type Quiz = {
     _id: string,
@@ -16,6 +17,7 @@ type Quiz = {
 const QuizzesPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [isLoading, setLoading] = useState<boolean>(true);
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const {sendRequest} = useSendRequest();
     const router = useRouter();
@@ -49,6 +51,8 @@ const QuizzesPage = () => {
                 }
             } catch (err) {
                 console.log(err);
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -120,7 +124,15 @@ const QuizzesPage = () => {
                     ))}
                 </div>
 
-                {filteredQuizzes.length === 0 && (
+                {isLoading && (
+                    <div className="text-center py-16">
+                        <div className="max-w-md mx-auto">
+                            <Loader />
+                        </div>
+                    </div>
+                )}
+
+                {filteredQuizzes.length === 0 && !isLoading && (
                     <div className="text-center py-16">
                         <div className="max-w-md mx-auto">
                             <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
