@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
         }
 
         const result = await Result.findById(resultId);
+        // console.log(result);
         
-        return NextResponse.json({ sucess: true, quizResult: result });
+        return NextResponse.json({ success: true, quizResult: result });
     } catch (err) {
         console.log(err);
         return NextResponse.json({ success: false, errMsg: 'Unknown server error'});

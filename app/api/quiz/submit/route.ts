@@ -29,18 +29,25 @@ type Category = {
 function analysisMapper(correctTopics: [string, number][],incorrectTopics: [string, number][]): Category[] {
     const topicMap: Record<string, { correct: number; incorrect: number }> = {};
 
-    for (const [topic, count] of correctTopics) {
-        if (!topicMap[topic]) {
-            topicMap[topic] = { correct: 0, incorrect: 0 };
+    // console.log("Mapper Inputs:\n")
+    // console.log(correctTopics, incorrectTopics);
+
+    if (correctTopics && correctTopics.length > 0) {
+        for (const [topic, count] of correctTopics) {
+            if (!topicMap[topic]) {
+                topicMap[topic] = { correct: 0, incorrect: 0 };
+            }
+            topicMap[topic].correct += count;
         }
-        topicMap[topic].correct += count;
     }
 
-    for (const [topic, count] of incorrectTopics) {
-        if (!topicMap[topic]) {
-            topicMap[topic] = { correct: 0, incorrect: 0 };
+    if (incorrectTopics && incorrectTopics.length > 0) {
+        for (const [topic, count] of incorrectTopics) {
+            if (!topicMap[topic]) {
+                topicMap[topic] = { correct: 0, incorrect: 0 };
+            }
+            topicMap[topic].incorrect += count;
         }
-        topicMap[topic].incorrect += count;
     }
 
     const categories: Category[] = Object.entries(topicMap).map(([topic, { correct, incorrect }]) => {
@@ -57,6 +64,7 @@ function analysisMapper(correctTopics: [string, number][],incorrectTopics: [stri
             };
         }
     );
+    // console.log(`Mapper Output: ${categories}`);
 
     return categories;
 }
@@ -66,9 +74,12 @@ async function analyseStrongAndWeakTopics(correctlyAnswered: AnswerObject[], inc
     
     return new Promise(async (resolve, reject) => {
         try {
+            let result;
             if (!await checkServerStatus()) {
                 reject('Unable to connect to the server or server shut down');
             }
+
+            // console.log(correctlyAnswered, incorrectlyAnswered);
 
             const SERVER_URL = process.env.FASTAPI_SERVER_URL;
             const correctlyAnsweredResponse = await fetch(`${SERVER_URL}/api/quiz/analyse-answers`,{
@@ -101,17 +112,17 @@ async function analyseStrongAndWeakTopics(correctlyAnswered: AnswerObject[], inc
 
             if (!correctlyAnsweredResponse || !incorrectlyAnsweredResponse) {
                 console.error("Missing one of the responses");
-                throw new Error('Missing response');
+                reject('Missing response');
             }
 
             if (correctlyAnsweredResponse.success !== true || incorrectlyAnsweredResponse.success !== true) {
-                console.error("Success flag missing or false in responses");
-                console.log("Correct response:", correctlyAnsweredResponse);
-                console.log("Incorrect response:", incorrectlyAnsweredResponse);
-                throw new Error('Error while getting the analysis');
+                result = analysisMapper(
+                    (correctlyAnsweredResponse.success ? correctlyAnsweredResponse.analysis.topics : []), 
+                    (incorrectlyAnsweredResponse.success ? incorrectlyAnsweredResponse.analysis.topics : [])
+                )
+            } else {
+                result = analysisMapper(correctlyAnsweredResponse.analysis.topics, incorrectlyAnsweredResponse.analysis.topics);
             }
-
-            const result = analysisMapper(correctlyAnsweredResponse.analysis, incorrectlyAnsweredResponse.analysis);
 
             resolve(result);
 
@@ -124,7 +135,7 @@ async function analyseStrongAndWeakTopics(correctlyAnswered: AnswerObject[], inc
 
 async function calculateResult(userAnswers: StringKeyObject, actualAnswers: AnswerObject[]) {
     const answers = Object.values(userAnswers);
-    const correctlyAnswered = [], incorrectlyAnswered = []
+    const correctlyAnswered = [], incorrectlyAnswered = [];
 
     let score = 0
     for (let i = 0; i < answers.length; i++) {
@@ -140,12 +151,11 @@ async function calculateResult(userAnswers: StringKeyObject, actualAnswers: Answ
         }
     }
 
-    console.log(correctlyAnswered, incorrectlyAnswered);
-    const analysis = await analyseStrongAndWeakTopics(correctlyAnswered, incorrectlyAnswered)
+    const analysis = await analyseStrongAndWeakTopics(correctlyAnswered, incorrectlyAnswered);
 
-    if (typeof analysis === 'string') {
-        return { score: score, completeSuccess: false }
-    }
+    // if (typeof analysis === 'string') {
+    //     return { score: score, completeSuccess: false };
+    // }
 
     return { score: score, completeSuccess: true, category: analysis };
 }

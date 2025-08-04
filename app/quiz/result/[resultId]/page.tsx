@@ -60,6 +60,7 @@ const QuizResultsPage: React.FC = () => {
                 });
 
                 if (result && result.success) {
+                    // console.log(result.quizResult);
                     setQuizResult(result.quizResult);
                 }
             } catch (err) {
@@ -93,7 +94,6 @@ const QuizResultsPage: React.FC = () => {
     const gradeInfo = getGradeInfo(quizResult.percentage);
     const strongCategories = quizResult.categoryBreakdown.filter(cat => cat.isStrong);
     const weakCategories = quizResult.categoryBreakdown.filter(cat => !cat.isStrong);
-
 
     const categoryData = quizResult.categoryBreakdown.map(cat => ({
         name: cat.category,

@@ -39,7 +39,7 @@ const QuizPage: React.FC = () => {
     const [timeRemaining, setTimeRemaining] = useState<number>(1800);
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-    const [quizResult, setResults] = useState<string>();
+    const [quizResult, setResults] = useState<string | null>(null);
     const [isAuthenicated, setAuthencated] = useState<boolean>(false);
     const [userData, setUserData] = useState<UserData>({
         username: '',
@@ -147,6 +147,7 @@ const QuizPage: React.FC = () => {
             });
 
             if (result && result.success) {
+                setResults(result.resultId);
             }
         } catch (err) {
             console.log(err);
@@ -205,8 +206,13 @@ const QuizPage: React.FC = () => {
                         </div>
                     </div>
                     <button
+                        disabled={quizResult === null}
                         onClick={() => showResults()} 
-                        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+                        className={`font-semibold py-3 px-8 rounded-lg transition-colors duration-200
+                                ${quizResult === null ? 
+                                    "bg-gray-300 hover:bg-gray-200 text-black" : 
+                                    'bg-purple-600 hover:bg-purple-700 text-white '}
+                            `}
                     >
                         View Results
                     </button>
