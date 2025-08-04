@@ -7,7 +7,7 @@ import { useSendRequest } from '../../../utilities/axiosInstance';
 import { useParams, useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import LoadingScreen from '../../../components/LoadingScreen';
-import QuizIdenticationForm from '@/components/IdentityForm';
+import QuizIdenticationForm from '../../../components/IdentityForm';
 
 interface UserAnswers {
     [questionIndex: string]: number;
