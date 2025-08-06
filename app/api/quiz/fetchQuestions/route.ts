@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
         const questions = await Question.aggregate([
             { $match: { quizId: quizObjectId } },
-            { $sample: { size: 10 } },
+            { $sample: { size: quizDetails.questionCount || 20 } },
             {
                 $project: {
                     question: 1,
