@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { ChangeEventHandler, useState } from "react";
 
 interface UserData {
@@ -19,7 +20,7 @@ interface CustomError {
 
 export default function QuizIdenticationForm({ userInput, hideForm, storeFormValues }: FormProps) {
     const [termsAgreed, setTermsAgreed] = useState<boolean>(false);
-
+    const router = useRouter();
     const [errors, setErrors] = useState<CustomError>({})
     
     const handleNameInput: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -118,6 +119,7 @@ export default function QuizIdenticationForm({ userInput, hideForm, storeFormVal
 
                         <div className="flex space-x-3 pt-4">
                             <button
+                                onClick={() => router.push('/quizzes')}
                                 type="button"
                                 className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-semibold"
                             >

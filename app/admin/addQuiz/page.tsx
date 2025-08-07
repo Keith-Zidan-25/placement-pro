@@ -7,6 +7,7 @@ import { useSendRequest } from '../../../utilities/axiosInstance';
 import { ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import { useRouter } from 'next/navigation';
 
 interface FormData extends Quiz {
     image?: File;
@@ -47,8 +48,10 @@ const QuizCreationPage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
     const [uploadError, setUploadError] = useState<string>('');
+    const [resultsPageLink, setResultsPageLink] = useState<string>('');
     const [showPreview, setShowPreview] = useState<boolean>(false);
     const {sendRequest} = useSendRequest();
+    const router = useRouter();
     
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -76,21 +79,54 @@ const QuizCreationPage: React.FC = () => {
         }
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            if (file.type.startsWith('image/')) {
-                setFormData(prev => ({
-                    ...prev,
-                    image: file,
-                    imagePath: file.name
-                }));
-            } else {
+
+        if (!file) {
+            // setErrors(prev => ({
+            //     ...prev,
+            //     image: 'Image Not found'
+            // }));
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            setErrors(prev => ({
+                ...prev,
+                image: 'File must be an image'
+            }));
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const result = await sendRequest({
+                config: {
+                    method: 'POST',
+                    url: '/api/ipfs-store',
+                    data: formData
+                }   
+            });
+
+            if (!result || !result.success) {
                 setErrors(prev => ({
                     ...prev,
-                    image: 'Please select a valid image file'
+                    image: `Image couldn't be uploaded`
                 }));
+                return;
             }
+            setFormData(prev => ({
+                ...prev,
+                imagePath: result.cid
+            }));
+        } catch (err) {
+            console.log(err);
+            setErrors(prev => ({
+                ...prev,
+                image: 'Error occured during image upload'
+            }));
         }
     };
 
@@ -304,6 +340,8 @@ const QuizCreationPage: React.FC = () => {
                 return;
             }
 
+            setResultsPageLink(result.quizId);
+
             setFormData({
                 title: '',
                 description: '',
@@ -315,7 +353,7 @@ const QuizCreationPage: React.FC = () => {
             });
             setQuestions([]);
             setUploadStatus('idle');
-            
+
             alert('Quiz created successfully!');
         } catch (error) {
             console.error('Error creating quiz:', error);
@@ -324,6 +362,10 @@ const QuizCreationPage: React.FC = () => {
             setIsSubmitting(false);
         }
     };
+
+    const showResultsPage = () => {
+        router.push(`/admin/resultDashboard/${resultsPageLink}`);
+    }
 
     return (
         <div className="min-h-screen bg-white">
@@ -651,6 +693,20 @@ const QuizCreationPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {resultsPageLink && resultsPageLink.length > 0 && (
+                <button
+                    disabled={resultsPageLink === null}
+                    onClick={() => showResultsPage()} 
+                    className={`font-semibold py-3 px-8 rounded-lg transition-colors duration-200
+                            ${resultsPageLink === null ? 
+                                "bg-gray-300 hover:bg-gray-200 text-black" : 
+                                'bg-purple-600 hover:bg-purple-700 text-white '}
+                        `}
+                >
+                    View Results
+                </button>
             )}
 
             <div>
