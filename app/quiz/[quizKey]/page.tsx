@@ -106,16 +106,16 @@ const QuizPage: React.FC = () => {
             if (quizData && currentQuestion < quizData.questions.length - 1) {
                 setCurrentQuestion(prev => prev + 1);
             }
+            if(currentQuestion === quizData.questions.length - 1) {
+                setShowConfirmation(true);
+            }
         }
     };
 
     const handleSubmitQuiz = async (): Promise<void> => {
         if (!quizData) return;
-
-        const finalAnswers: UserAnswers =
-            selectedAnswer !== null
-                ? { ...userAnswers, [quizData?.questions[currentQuestion]._id]: selectedAnswer }
-                : userAnswers;
+        
+        const finalAnswers: UserAnswers =userAnswers;
 
         const submissionData: QuizSubmissionData = {
             ...userData,
@@ -135,7 +135,7 @@ const QuizPage: React.FC = () => {
     };
 
     const submitToServer = async (submissionData: QuizSubmissionData): Promise<void> => {
-        // console.log(submissionData);
+        //console.log(submissionData);
 
         try {
             const result = await sendRequest({
@@ -310,8 +310,7 @@ const QuizPage: React.FC = () => {
                         </div>
 
                         <div className="flex space-x-4">
-                            {currentQuestion < quizData.questions.length - 1 ? (
-                                <button
+                             <button
                                     onClick={handleNext}
                                     disabled={selectedAnswer === null}
                                     className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
@@ -323,15 +322,6 @@ const QuizPage: React.FC = () => {
                                     Next
                                     <ArrowRight className="w-4 h-4 ml-2" />
                                 </button>
-                            ) : (
-                                <button
-                                    onClick={() => setShowConfirmation(true)}
-                                    className="flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all duration-200"
-                                >
-                                    Submit Quiz
-                                    <Send className="w-4 h-4 ml-2" />
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
