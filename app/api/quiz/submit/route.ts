@@ -79,7 +79,7 @@ async function analyseStrongAndWeakTopics(correctlyAnswered: AnswerObject[], inc
                 reject('Unable to connect to the server or server shut down');
             }
 
-            // console.log(correctlyAnswered, incorrectlyAnswered);
+            console.log(correctlyAnswered, incorrectlyAnswered);
 
             const SERVER_URL = process.env.FASTAPI_SERVER_URL;
             const correctlyAnsweredResponse = await fetch(`${SERVER_URL}/api/quiz/analyse-answers`,{

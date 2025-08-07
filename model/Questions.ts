@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const QuestionSchema = new Schema({
     quizId: {
@@ -31,5 +31,5 @@ const QuestionSchema = new Schema({
     }
 });
 
-const Question = model('Question', QuestionSchema);
+const Question = models.Question || model('Question', QuestionSchema);
 export default Question;

@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 // interface Category {
 //     category: string;
@@ -61,5 +61,5 @@ const ResultSchema = new Schema({
     ]
 });
 
-const Result = model('Result', ResultSchema);
+const Result = models.Result || model('Result', ResultSchema);
 export default Result;
