@@ -25,6 +25,10 @@ const QuizSchema = new Schema({
     difficulty: {
         type: Number,
         default: 1
+    },
+    category: {
+        type: String,
+        required: true
     }
 });
 

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
         await Question.insertMany(questionsWithId);
 
-        return NextResponse.json({ success: true, message: 'Quiz created'});
+        return NextResponse.json({ success: true, message: 'Quiz created', quizId: newQuiz._id });
     } catch (err) {
         console.log(err);
         return NextResponse.json({ success: false, errMsg: 'Unknown server error' });
