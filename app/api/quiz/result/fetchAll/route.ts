@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
 
         const { searchParams } = new URL(req.url);
         const quizId = searchParams.get('quizId');
+        console.log(quizId);
 
         if (!quizId) {
             return NextResponse.json({ success: false, errorMsg: "result key is required." }, { status: 400 });
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
             category: 1
         });
 
-        if (!quizDetails?.title || quizDetails.category) {
+        if (!quizDetails?.title && quizDetails.category) {
             return NextResponse.json({ success: false, errMsg: 'Quiz data incomplete' });
         }
 
