@@ -119,7 +119,7 @@ const QuizCreationPage: React.FC = () => {
             }
             setFormData(prev => ({
                 ...prev,
-                imagePath: result.cid
+                imagePath: `https://ipfs.io/ipfs/${result.cid}`
             }));
         } catch (err) {
             console.log(err);
@@ -151,7 +151,7 @@ const QuizCreationPage: React.FC = () => {
 
         if (questions.length === 0) {
             newErrors.questions = 'Please upload questions file';
-        } else if (questions.length !== formData.questionCount) {
+        } else if (questions.length < formData.questionCount) {
             newErrors.questions = `Number of questions (${questions.length}) doesn't match the specified count (${formData.questionCount})`;
         }
 
@@ -164,7 +164,7 @@ const QuizCreationPage: React.FC = () => {
             Papa.parse<Question>(file, {
                 header: true,
                 skipEmptyLines: true,
-                delimiter: ';',
+                delimiter: ',',
                 complete: (results) => {
                     try {
                         const parsedQuestions: Question[] = results.data.map((row, index: number) => {
@@ -322,7 +322,8 @@ const QuizCreationPage: React.FC = () => {
                 score: formData.score,
                 imagePath: formData.imagePath,
                 difficulty: formData.difficulty,
-                questions: questions
+                questions: questions, 
+                category: formData.description
             };
 
             console.log('Creating quiz:', quizData);

@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
             questionCount: questionCount,
             score: score,
             imagePath: imagePath,
-            difficulty: difficulty
+            difficulty: difficulty,
+            category: description
         }
 
         const newQuiz = new Quiz(quizData);

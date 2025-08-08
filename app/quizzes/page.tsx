@@ -11,7 +11,7 @@ type Quiz = {
     _id: string,
     title: string,
     description: string,
-    image: string
+    imagePath: string
 }
 
 const QuizzesPage = () => {
@@ -109,7 +109,7 @@ const QuizzesPage = () => {
                     {filteredQuizzes.map((quiz) => (
                         <div key={quiz._id} className={`bg-gray-50 rounded-lg overflow-hidden shadow-lg`}>
                             <div className="w-full h-48">
-                                <img src={quiz.image} alt={quiz.title} className="w-full h-full object-cover bg-center" />
+                                <img src={quiz.imagePath} alt={quiz.title} className="w-full h-full object-cover bg-center" />
                             </div>
                                 <div className="p-4 flex flex-col gap-2 w-full">
                                     <h3 className="text-lg font-semibold text-black">{quiz.title}</h3>
