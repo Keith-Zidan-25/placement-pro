@@ -129,6 +129,7 @@ const QuizPage: React.FC = () => {
         try {
             await submitToServer(submissionData);
             setIsSubmitted(true);
+            setShowConfirmation(false);
         } catch (error) {
             console.error("Submission error:", error);
             setIsSubmitting(false); 
@@ -157,7 +158,6 @@ const QuizPage: React.FC = () => {
 
     const handleConfirmSubmit = (): void => {
         console.log(userData);
-        setShowConfirmation(false);
         handleSubmitQuiz();
     };
 
