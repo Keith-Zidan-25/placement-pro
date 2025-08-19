@@ -45,6 +45,7 @@ const QuizPage: React.FC = () => {
         username: '',
         numberId: ''
     })
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // to manage submission state
 
     const { sendRequest } = useSendRequest();
 
@@ -114,23 +115,24 @@ const QuizPage: React.FC = () => {
 
     const handleSubmitQuiz = async (): Promise<void> => {
         if (!quizData) return;
-        
-        const finalAnswers: UserAnswers =userAnswers;
 
+        setIsSubmitting(true);  // to manage submission state
+        
         const submissionData: QuizSubmissionData = {
             ...userData,
             quizId: quizkey ?? '',
-            answers: finalAnswers,
+            answers: userAnswers,
             timeSpent: 1800 - timeRemaining,
             completedAt: new Date().toISOString()
         };
-
+        
         try {
             await submitToServer(submissionData);
-            setUserAnswers(finalAnswers);
             setIsSubmitted(true);
+            setShowConfirmation(false);
         } catch (error) {
             console.error("Submission error:", error);
+            setIsSubmitting(false); 
         }
     };
 
@@ -156,7 +158,6 @@ const QuizPage: React.FC = () => {
 
     const handleConfirmSubmit = (): void => {
         console.log(userData);
-        setShowConfirmation(false);
         handleSubmitQuiz();
     };
 
@@ -344,9 +345,10 @@ const QuizPage: React.FC = () => {
                             </button>
                             <button
                                 onClick={handleConfirmSubmit}
+                                disabled={isSubmitting}  // to manage submission state
                                 className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                             >
-                                Submit
+                               {isSubmitting ? <span>Submitting...</span> : <span>Submit</span>} 
                             </button>
                         </div>
                     </div>
